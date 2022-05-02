@@ -10,7 +10,6 @@ namespace University_MGS_API.Controllers
     [ApiController]
     public class StudentController : ControllerBase
     {
-
         private readonly DataContext _db;
 
         public StudentController(DataContext db)
@@ -31,7 +30,7 @@ namespace University_MGS_API.Controllers
         {
             var student = await _db.students.FindAsync(id);
 
-            if(student == null)
+            if (student == null)
             {
                 return BadRequest("Student Not Found!");
             }
@@ -55,7 +54,7 @@ namespace University_MGS_API.Controllers
         {
             var student = await _db.students.FindAsync(request.StuID);
 
-            if(student == null)
+            if (student == null)
             {
                 return BadRequest("Student Not Found");
             }
@@ -71,14 +70,14 @@ namespace University_MGS_API.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<Student>> DeleteStudent(int id)
         {
-            if(id == 0)
+            if (id == 0)
             {
                 return NotFound();
             }
 
             var student = await _db.students.FindAsync(id);
 
-             _db.students.Remove(student);
+            _db.students.Remove(student);
             await _db.SaveChangesAsync();
 
             return Ok(student);
