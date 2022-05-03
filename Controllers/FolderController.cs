@@ -14,7 +14,7 @@ namespace University_MGS_API.Controllers
             _webHostEnvironment = webHostEnvironment;
         }
 
-        [HttpGet]
+        [HttpGet("View")]
         public IActionResult Index(string folderName)
         {
             string[] filePaths = Directory.GetFiles(Path.Combine(_webHostEnvironment.WebRootPath, "Uploads/" + folderName));
@@ -29,7 +29,7 @@ namespace University_MGS_API.Controllers
             return Ok(folders);
         }
 
-        [HttpPost]
+        [HttpPost("Create")]
         public IActionResult CreateFolder(string folderName)
         {
             string webRootPath = _webHostEnvironment.WebRootPath;
@@ -45,6 +45,72 @@ namespace University_MGS_API.Controllers
             else
             {
                 return BadRequest("The folder " + folderName + " is already existed!");
+            }
+        }
+
+        [HttpPut("Move")]
+        public IActionResult MoveFolder(string folderName, string newFolderName)
+        {
+            string webRootPath = _webHostEnvironment.WebRootPath;
+
+            string folder = Path.Combine(webRootPath, "Uploads/" + folderName);
+            string newFolder = Path.Combine(webRootPath, "Uploads/" + newFolderName);
+
+            if (Directory.Exists(folder))
+            {
+                if(Directory.Exists(newFolderName))
+                {
+                    Directory.Move(folder, newFolder);
+                }
+            }
+            else
+            {
+                return BadRequest("The " + newFolderName + " folder isn't exist!");
+            }
+
+            return Ok("The folder " + folderName + " moved to " + newFolderName + " Successfully!");
+        }
+
+        [HttpPut("Rename")]
+        public IActionResult RenameFolder(string folderName, string newFolderName)
+        {
+            string webRootPath = _webHostEnvironment.WebRootPath;
+
+            string folder = Path.Combine(webRootPath, "Uploads/" + folderName);
+            string newFolder = Path.Combine(webRootPath, "Uploads/" + newFolderName);
+
+
+            if (Directory.Exists(folder))
+            {
+                if(!Directory.Exists(newFolder))
+                    Directory.Move(folder, newFolder);
+                else
+                    return BadRequest("The " + newFolderName + " folder is already existed!");
+
+                return Ok("The folder " + folderName + " changed to " + newFolderName + " Successfully!");
+            }
+            else
+            {
+                return BadRequest("The " + newFolderName + " folder is already existed!");
+            }
+        }
+
+        [HttpDelete("Delete")]
+        public IActionResult DeleteFolder(string folderName)
+        {
+            string webRootPath = _webHostEnvironment.WebRootPath;
+
+            string folder = Path.Combine(webRootPath, "Uploads/" + folderName);
+
+            if (Directory.Exists(folder))
+            {
+                Directory.Delete(folder);
+
+                return Ok("The folder " + folderName + " is deleted succefully!");
+            }
+            else
+            {
+                return BadRequest("The folder " + folderName + " isn't exist!");
             }
         }
     }
