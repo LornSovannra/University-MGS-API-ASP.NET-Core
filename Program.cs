@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
 using Swashbuckle.AspNetCore.Filters;
@@ -10,6 +11,20 @@ using University_MGS_API.Data;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+//Enable CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowPolicy",
+        options =>
+        {
+            options
+                .WithOrigins("http://localhost:3000")
+                .AllowCredentials()
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -43,18 +58,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-//Enable CORS
-builder.Services.AddCors(options =>
-    {
-        options.AddPolicy("AllowOrigin",
-            options =>
-            {
-                options.AllowAnyOrigin()
-                    .AllowAnyOrigin()
-                    .AllowAnyHeader()
-                    .AllowAnyMethod();
-            });
-    });
 
 //JSON Serializer
 builder.Services.AddControllersWithViews()
@@ -66,9 +69,6 @@ builder.Services.AddControllersWithViews()
 
 var app = builder.Build();
 
-//Enable CORS
-app.UseCors(options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -78,7 +78,12 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+//Enable CORS
+//app.UseCors(options => options.WithOrigins("http://localhost:3000").AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+
+
 app.UseAuthentication();
+app.UseCors("AllowPolicy");
 
 app.UseAuthorization();
 
